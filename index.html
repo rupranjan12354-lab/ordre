@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOSTOM INDUSTRIES - Order Form</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  background:#ffffff;
+  padding:15px;
+}
+
+.header{
+  border-bottom:2px solid #000;
+  margin-bottom:15px;
+  text-align:center;
+}
+.header h1{
+  margin:0;
+  color:#0b5394;
+  font-size:26px;
+}
+.header p{
+  margin:4px 0;
+  font-size:14px;
+}
+
+/* ===== FORM INFO ===== */
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.info input{
+  padding:12px;
+  font-size:16px;
+  width:100%;
+}
+
+/* ===== BUTTONS ===== */
+button{
+  padding:12px;
+  font-size:16px;
+  cursor:pointer;
+  border-radius:6px;
+}
+.addbtn{
+  background:#0b5394;
+  color:#fff;
+  border:none;
+  margin-top:10px;
+  width:100%;
+}
+.submitbtn{
+  background:#25D366;
+  color:#fff;
+  border:none;
+  width:100%;
+  font-size:18px;
+  padding:14px;
+  margin-top:15px;
+}
+
+/* ===== TABLE ===== */
+.table-wrap{
+  overflow-x:auto;
+  margin-top:10px;
+}
+table{
+  width:100%;
+  min-width:700px;
+  border-collapse:collapse;
+}
+table th, table td{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+}
+table th{
+  background:#f0f0f0;
+}
+table input{
+  padding:10px;
+  font-size:16px;
+  width:100%;
+}
+
+/* ===== TOTAL ===== */
+.total{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.total input{
+  padding:12px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  margin-top:15px;
+  font-size:12px;
+  text-align:center;
+  color:#555;
+}
+
+/* ===== MOBILE VIEW ===== */
+@media(max-width:600px){
+  .info{
+    grid-template-columns:1fr;
+  }
+  .header h1{
+    font-size:22px;
+  }
+  table{
+    min-width:650px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Lostom snacks</h1>
+    <p><a href="https://www.lostomindustries.com">www.lostomindustries.com</a></p>
+    
+  </div>
+
+  <div class="info">
+    <div>Party / Shop Name<br><input id="party"></div>
+    <div>Mobile Number<br><input id="mobile"></div>
+    <div>Sales Person Name<br><input id="sales"></div>
+    <div>Order Date<br><input type="date" id="date"></div>
+  </div>
+
+  <button class="addbtn" onclick="addRow()">➕ Add Product Row</button>
+
+  <div class="table-wrap">
+    <table id="t">
+      <tr>
+        <th>Sr</th>
+        <th>Product Name</th>
+        <th>Qty</th>
+        <th>Rate</th>
+        <th>Amount</th>
+        <th>Delete</th>
+      </tr>
+    </table>
+  </div>
+
+  <div class="total">
+    <div>Total Quantity<br><input id="totalQty" readonly></div>
+    <div>Total Amount (₹)<br><input id="totalAmt" readonly></div>
+  </div>
+
+  <button class="submitbtn" onclick="sendOrder()">📲 Submit Order on WhatsApp</button>
+
+  <div class="footer">
+    2010 © Lostom snacks | All Rights Reserved
+  </div>
+
+</div>
+
+<script>
+var count=0;
+
+function addRow(){
+  count++;
+  var t=document.getElementById("t");
+  var r=t.insertRow(-1);
+  r.insertCell(0).innerHTML=count;
+  r.insertCell(1).innerHTML="<input>";
+  r.insertCell(2).innerHTML="<input type='number' oninput='calculate()'>";
+  r.insertCell(3).innerHTML="<input type='number'>";
+  r.insertCell(4).innerHTML="<input type='number' oninput='calculate()'>";
+  r.insertCell(5).innerHTML="<button onclick='deleteRow(this)'>❌</button>";
+}
+
+function deleteRow(b){
+  b.parentNode.parentNode.remove();
+  calculate();
+}
+
+function calculate(){
+  var t=document.getElementById("t");
+  var tq=0,ta=0;
+  for(var i=1;i<t.rows.length;i++){
+    tq+=Number(t.rows[i].cells[2].children[0].value)||0;
+    ta+=Number(t.rows[i].cells[4].children[0].value)||0;
+  }
+  totalQty.value=tq;
+  totalAmt.value=ta;
+}
+
+function sendOrder(){
+  var msg="LOSTOM INDUSTRIES ORDER\n\n";
+  msg+="Party: "+party.value+"\n";
+  msg+="Mobile: "+mobile.value+"\n";
+  msg+="Sales: "+sales.value+"\n";
+  msg+="Date: "+date.value+"\n\n";
+  var t=document.getElementById("t");
+  for(var i=1;i<t.rows.length;i++){
+    msg+=i+") "+t.rows[i].cells[1].children[0].value+
+         " | Qty:"+t.rows[i].cells[2].children[0].value+
+         " | ₹"+t.rows[i].cells[4].children[0].value+"\n";
+  }
+  msg+="\nTotal Qty: "+totalQty.value;
+  msg+="\nTotal Amount: ₹"+totalAmt.value;
+  window.open("https://wa.me/917033810886?text="+encodeURIComponent(msg));
+}
+
+for(var i=0;i<5;i++) addRow();
+</script>
+
+</body>
+</html>
